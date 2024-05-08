@@ -1,0 +1,48 @@
+// ==UserScript==
+// @name         簡易USB設備操作腳本
+// @namespace    simple-usb-device-operation-script
+// @version      1
+// @description  用於與USB設備進行簡單的交互操作。
+// @author       腳本貓開發員S0919756
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
+
+var globalRequestState = {
+    isRequesting: false, 
+    requestDetails: null 
+};
+
+function sendRequest(details) {
+    globalRequestState.isRequesting = true;
+    globalRequestState.requestDetails = details; 
+    window.postMessage({ type: 'supportRequest', details: details }, '*');
+}
+
+window.addEventListener('message', function(event) {
+    if (event.origin !== '您後台腳本的來源') return;
+
+    if (event.data.type === 'supportResponse') {
+        console.log('後台支援回應:', event.data.result);
+        globalRequestState.isRequesting = false; 
+        globalRequestState.requestDetails = null;
+    }
+}, { once: true });
+
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('頁面加載完成');
+    if (!globalRequestState.isRequesting) { 
+        sendRequest('需要的支援細節'); 
+    }
+});
+let usbDeviceRequested = false;
+  usbDeviceRequested = true;
+  navigator.usb.requestDevice({ filters: [] }) 
+    .then(device => {
+
+      console.log('USB設備已連接:', device);
+    })
+    .catch(error => {
+
+      console.error('USB設備連接錯誤:', error);
+    });
