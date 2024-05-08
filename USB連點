@@ -1,0 +1,58 @@
+// ==UserScript==
+// @name         簡易USB連續點擊
+// @namespace    simple-usb-device-operation-script
+// @version      1
+// @description  用於與USB設備進行簡單的交互操作。
+// @author       腳本貓開發員s0919756
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
+
+var globalRequestState = {
+    isRequesting: false, 
+    requestDetails: null 
+};
+
+function sendRequest(details) {
+    globalRequestState.isRequesting = true;
+    globalRequestState.requestDetails = details; 
+    window.postMessage({ type: 'supportRequest', details: details }, '*');
+}
+
+window.addEventListener('message', function(event) {
+    if (event.origin !== '您後台腳本的來源') return;
+
+    if (event.data.type === 'supportResponse') {
+        console.log('後台支援回應:', event.data.result);
+        globalRequestState.isRequesting = false; 
+        globalRequestState.requestDetails = null;
+    }
+}, );
+
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('頁面加載完成');
+    if (!globalRequestState.isRequesting) { 
+        sendRequest('需要的支援細節'); 
+    }
+});
+let intervalId; // 用於存儲setInterval的ID
+
+// 監聽按鍵事件來啟動或停止USB設備的電源切換
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'F1') {
+    // F1按鍵執行，啟動連續點擊.可變更
+    navigator.usb.requestDevice({ filters: [] }) // filters: [] 表示不過濾任何設備
+    .then(device => {
+      console.log('USB設備已連接', device);
+      // 使用setInterval來定期執行切換USB電源的函數，實現連點功能
+      intervalId = setInterval(() => {
+        // ... 這裡添加控制USB電源的代碼...
+        console.log('USB電源已切換');
+      }, 50); // 每50毫秒切換一次USB電源可變更
+    })
+  } else if (event.key === 'F2') {
+    // F2按鍵停止，停止連續點擊.可變更
+    clearInterval(intervalId); // 停止setInterval
+    console.log('USB電源切換已停止');
+  }
+});
