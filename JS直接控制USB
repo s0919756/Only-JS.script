@@ -47,13 +47,13 @@
   }, 1000); 
 
   const originalCodeHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
-  function calculateHash(code) {
-    
+  function calculateHash(_code) {
+    // 假設這是一個哈希計算函數
   }
   function checkForTampering(code) {
     if (calculateHash(code) !== originalCodeHash) {
       console.error('代碼已被篡改，將執行自毀程序。');
-
+      // 在這裡添加自毀程序的代碼
     }
   }
   setInterval(() => {
