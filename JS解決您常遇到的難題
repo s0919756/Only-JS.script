@@ -1,0 +1,98 @@
+列舉五個常常遇到的困難
+動態內容的實時捕捉：在現代網頁中，內容經常是動態加載的。waitForElement 函數通過 MutationObserver 監聽 DOM 變化，能夠在目標元素出現時立即執行操作，
+跨框架（iframe）的元素操作：許多網站使用 iframe 來嵌入外部內容，這使得跨框架的 DOM 操作變得複雜。handleIframe 函數能夠訪問和操作 iframe 內的元素，
+異步HTTP請求的同步化處理：網頁腳本中的異步操作管理是一個重點，特別是當涉及到網絡請求時異步的
+全局狀態管理：在複雜的應用中，管理和追蹤全局狀態
+頁面元素的即時操作：在某些情況下，需要對頁面上的元素進行即時操作。
+// ==UserScript==
+// @name         全局變量錯誤處理
+// @namespace    https://github.com/s0919756
+// @version      0.1
+// @description  解決多種常見的問題
+// @author       s0919756
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
+(function() {
+    'use strict';
+    // 全局自動化管理器
+    const GlobalAutomationManager = {
+        // 全局錯誤狀態追蹤
+        errorStatus: {
+            hasError: false, // 是否有錯誤發生
+            errorMessage: '' // 錯誤信息
+        },
+        // 初始化函數
+        init: function() {
+            this.waitForElement(); // 等待元素加載
+            this.handleIframe();   // 處理iframe
+            this.syncHttpRequest(); // 同步HTTP請求
+        },
+        // 等待元素加載
+        waitForElement: function() {
+            const observer = new MutationObserver((mutations, obs) => {
+                const element = document.querySelector('#desired-element');
+                if (element) {
+                    // 元素出現了，執行你的代碼
+                    obs.disconnect(); // 停止監聽
+                }
+            });
+            observer.observe(document, { childList: true, subtree: true });
+        },
+        // 處理iframe
+        handleIframe: function() {
+            const iframe = document.querySelector('iframe');
+            if (iframe) {
+                const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+                // 在iframe內容中查找元素
+                const elementInsideIframe = innerDoc.querySelector('#element-inside-iframe');
+                if (elementInsideIframe) {
+                    // 處理iframe中的元素
+                    // 這裡添加您的代碼來處理元素
+                }
+            }
+        },
+        // 同步HTTP請求
+        syncHttpRequest: async function() {
+            // 使用 async/await 處理 GM_xmlhttpRequest 的異步行為
+            const fetchData = async (url) => {
+                return new Promise((resolve, reject) => {
+                    GM_xmlhttpRequest({
+                        method: 'GET',
+                        url: url,
+                        onload: function(response) {
+                            resolve(response.responseText); // 請求成功時執行
+                        },
+                        onerror: function(error) {
+                            reject(error); // 請求失敗時執行
+                        }
+                    });
+                });
+            };
+            // 使用範例
+            (async () => {
+                try {
+                    const data = await fetchData('https://example.com');
+                    console.log(data); // 處理數據
+                } catch (error) {
+                    console.error(error); // 處理錯誤
+                }
+            })();
+        }
+     };
+
+    // 啟動全局自動化管理器
+    GlobalAutomationManager.init();
+})();
+  const originalCodeHash = 'e3b0c44298fcd454%%^%$^&%^*&^5454^&***(&*ca495991b7852b855';
+  function calculateHash(_code) {
+  }
+  function checkForTampering(code) {
+    if (calculateHash(code) !== originalCodeHash) {
+      console.error('代碼已被篡改，將執行自毀程序。');
+    }
+  }
+  setInterval(() => {
+    checkForTampering(document.body.innerHTML); 
+  }, 3600000);
+})();
